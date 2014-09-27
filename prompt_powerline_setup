@@ -8,57 +8,6 @@
 # Authors:
 #   David Rice <me@davidjrice.co.uk>
 
-ZSH_THEME_REP_TIME_SINCE_COMMIT_SHORT="%{$fg[green]%}"
-ZSH_THEME_REP_TIME_SINCE_COMMIT_MEDIUM="%{$fg[yellow]%}"
-ZSH_THEME_REP_TIME_SINCE_COMMIT_LONG="%{$fg[red]%}"
-ZSH_THEME_REP_TIME_SINCE_COMMIT_NEUTRAL="%{$fg[cyan]%}"
-
-# returns the time since last git commit
-function git_time_details() {
-  # only proceed if there is actually a git repository
-  if `git rev-parse --git-dir > /dev/null 2>&1`; then
-    # only proceed if there is actually a commit
-    if [[ $(git log 2>&1 > /dev/null | grep -c "^fatal: bad default revision") == 0 ]]; then
-      # get the last commit hash
-      # lc_hash=`git log --pretty=format:'%h' -1 2> /dev/null`
-      # get the last commit time
-      lc_time=`git log --pretty=format:'%at' -1 2> /dev/null`
-
-      now=`date +%s`
-      seconds_since_last_commit=$((now-lc_time))
-      lc_time_since=`time_since_commit $seconds_since_last_commit`
-
-      echo "$lc_time_since"
-    else
-      echo ""
-    fi
-  else
-    echo ""
-  fi
-}
-
-# returns the time by given seconds
-function time_since_commit() {
-  seconds_since_last_commit=$(($1 + 0))
-
-  # totals
-  MINUTES=$((seconds_since_last_commit / 60))
-  HOURS=$((seconds_since_last_commit/3600))
-
-  # sub-hours and sub-minutes
-  DAYS=$((seconds_since_last_commit / 86400))
-  SUB_HOURS=$((HOURS % 24))
-  SUB_MINUTES=$((MINUTES % 60))
-
-  if [ "$HOURS" -gt 24 ]; then
-    echo "${DAYS}d${SUB_HOURS}h${SUB_MINUTES}m"
-  elif [ "$MINUTES" -gt 60 ]; then
-    echo "${HOURS}h${SUB_MINUTES}m"
-  else
-    echo "${MINUTES}m"
-  fi
-}
-
 function prompt_powerline_precmd {
   # Check for untracked files or updated submodules since vcs_info doesn't.
   if [[ ! -z $(git ls-files --other --exclude-standard 2> /dev/null) ]]; then
@@ -143,9 +92,8 @@ function prompt_powerline_setup {
 
   POWERLINE_LEFT_A="%K{green}%F{white} %~ %k%f%F{green}%K{blue}"$POWERLINE_SEPARATOR
   POWERLINE_LEFT_B="%k%f%F{white}%K{blue} "'${vcs_info_msg_0_}'" %k%f%F{blue}%K{black}"$POWERLINE_SEPARATOR
-  POWERLINE_LEFT_C=" %k%f%F{white}%K{black}"'$(git_time_details)'" %k%f%F{black}"$POWERLINE_SEPARATOR"%f "
 
-  PROMPT=$POWERLINE_LEFT_A$POWERLINE_LEFT_B$POWERLINE_LEFT_C
+  PROMPT=$POWERLINE_LEFT_A$POWERLINE_LEFT_B
 }
 
 prompt_powerline_setup "$@"
