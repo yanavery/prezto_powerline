@@ -1,6 +1,5 @@
 #
 # A ZSH theme based on a combination of the skwp prezto theme and the robl ohmyzsh theme.
-#  * RVM info shown on the right
 #  * Git branch info on the left
 #  * Single line prompt
 #  * Time since last commit on the left
@@ -60,17 +59,6 @@ function time_since_commit() {
   fi
 }
 
-function rvm_info_for_prompt {
-  if [[ -d ~/.rvm/ ]]; then
-    local ruby_version=$(~/.rvm/bin/rvm-prompt)
-    if [ -n "$ruby_version" ]; then
-      echo "$ruby_version"
-    fi
-  else
-    echo ""
-  fi
-}
-
 function prompt_powerline_precmd {
   # Check for untracked files or updated submodules since vcs_info doesn't.
   if [[ ! -z $(git ls-files --other --exclude-standard 2> /dev/null) ]]; then
@@ -81,9 +69,6 @@ function prompt_powerline_precmd {
   zstyle ':vcs_info:*:prompt:*' formats "${fmt_branch}"
 
   vcs_info 'prompt'
-  RVM_PRECMD_INFO=$(rvm_info_for_prompt)
-
-  # zstyle ':prezto:module:ruby' rvm '%r'
 }
 
 function prompt_powerline_setup {
@@ -144,19 +129,6 @@ function prompt_powerline_setup {
   zstyle ':vcs_info:*:prompt:*' formats       "${fmt_branch}"
   zstyle ':vcs_info:*:prompt:*' nvcsformats   ""
 
-  # SPLIT RVM PROMPT INFO
-  # TODO: should assign this to local variable? somehow doesn't work correctly.
-  rvm_split=("${(s/@/)$(rvm_info_for_prompt)}")
-
-  # if [ "$POWERLINE_RIGHT_B" = "" ]; then
-    # POWERLINE_RIGHT_B=%D{%H:%M:%S}
-    local powerline_right_b=$rvm_split[1]
-  # fi
-
-  # if [ "$POWERLINE_RIGHT_A" = "" ]; then
-    local powerline_right_a=$rvm_split[2]
-  # fi
-
   # Setup powerline style colouring
   POWERLINE_COLOR_BG_GRAY=%K{240}
   POWERLINE_COLOR_BG_LIGHT_GRAY=%K{240}
@@ -174,12 +146,6 @@ function prompt_powerline_setup {
   POWERLINE_LEFT_C=" %k%f%F{white}%K{black}"'$(git_time_details)'" %k%f%F{black}"$POWERLINE_SEPARATOR"%f "
 
   PROMPT=$POWERLINE_LEFT_A$POWERLINE_LEFT_B$POWERLINE_LEFT_C
-  # RPROMPT=$POWERLINE_COLOR_FG_WHITE$POWERLINE_R_SEPARATOR"%f$POWERLINE_COLOR_BG_WHITE $POWERLINE_COLOR_FG_GRAY$powerline_right_b "$POWERLINE_R_SEPARATOR"%f%k$POWERLINE_COLOR_BG_GRAY$POWERLINE_COLOR_FG_WHITE $powerline_right_a %f%k"
-  # RPROMPT=$POWERLINE_COLOR_FG_WHITE$POWERLINE_R_SEPARATOR"%f$POWERLINE_COLOR_BG_WHITE $POWERLINE_COLOR_FG_GRAY"'$powerline_right_b'" "$POWERLINE_R_SEPARATOR"%f%k$POWERLINE_COLOR_BG_GRAY$POWERLINE_COLOR_FG_WHITE "'$powerline_right_a'" %f%k"
-  RPROMPT=$POWERLINE_COLOR_FG_WHITE$POWERLINE_R_SEPARATOR"%f$POWERLINE_COLOR_BG_WHITE $POWERLINE_COLOR_FG_GRAY"'$(rvm_info_for_prompt)'" "
 }
 
 prompt_powerline_setup "$@"
-
-
-
